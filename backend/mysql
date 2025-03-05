@@ -67,3 +67,12 @@ ALTER TABLE `surveyapp`.`userdetails`
 CHANGE COLUMN `id` `id` INT NOT NULL AUTO_INCREMENT ;
 
 
+
+CREATE TABLE `surveyapp`.`admintable` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `userName` VARCHAR(45) NULL,
+  `password` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`));
+
+
+

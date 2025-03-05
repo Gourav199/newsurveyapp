@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 const cors = require('cors'); // Import cors
 
 const app = express();
-const port = 3000;
+const port = 4000;
 
 app.use(express.json({ limit: '100mb' })); // Increase limit
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
@@ -65,42 +65,95 @@ app.get('/employees', (req, res) => {
 });
 
 // Login route without bcrypt
-app.post('/login', (req, res) => {
-    console.log("Request Body:", req.body);
-  
-    const { userName, password } = req.body;
-  
-    if (!userName || !password) {
-      return res.status(400).json({ message: "Username and password are required" });
-    }
-  
-    pool.query('SELECT * FROM employee WHERE employeeUserName = ?', [userName], (err, results) => {
-      if (err) {
-        console.error("Database error:", err);
-        return res.status(500).json({ message: 'Database error' });
+app.post('/login', async (req, res) => {
+  try {
+      console.log("🚀 Received login request");
+
+      const { userName, password } = req.body;
+      console.log("📩 Request body:", req.body);
+
+      if (!userName || !password) {
+          console.log("⚠️ Missing username or password");
+          return res.status(400).json({ message: "Username and password are required" });
       }
-  
+
+      console.log("🔍 Querying database for user:", userName);
+
+      // Use pool.execute() instead of pool.query()
+      const [results] = await pool.execute('SELECT * FROM employee WHERE employeeUserName = ?', [userName]);
+
+      console.log("📊 Query executed, results:", results);
+
       if (results.length === 0) {
-        console.log("No user found with username:", userName);
-        return res.status(401).json({ message: 'Invalid username or password' });
+          console.log("⚠️ No user found with username:", userName);
+          return res.status(401).json({ message: 'Invalid username or password' });
       }
-  
+
       const user = results[0];
-  
-      console.log("User found:", user);
-  
-      // Fix: Compare with `employeePassword` instead of `password`
+      console.log("✅ User found:", user);
+
       if (password !== user.employeePassword) {
-        console.log("Password does not match");
-        return res.status(401).json({ message: 'Invalid username or password' });
+          console.log("❌ Password does not match");
+          return res.status(401).json({ message: 'Invalid username or password' });
       }
-  
-      // Remove password before sending user data
+
+      console.log("🎉 Login successful");
+
       delete user.employeePassword;
-  
       res.json({ message: 'Login successful', user });
-    });
-  });
+
+  } catch (error) {
+      console.error("❌ Database error:", error);
+      res.status(500).json({ message: 'Database error' });
+  }
+});
+
+
+//admin login 
+
+app.post('/adminLogin', async (req, res) => {
+  try {
+      console.log("🚀 Received login request");
+
+      const { userName, password } = req.body;
+      console.log("📩 Request body:", req.body);
+
+      if (!userName || !password) {
+          console.log("⚠️ Missing username or password");
+          return res.status(400).json({ message: "Username and password are required" });
+      }
+
+      console.log("🔍 Querying database for user:", userName);
+
+      // Use pool.execute() instead of pool.query()
+      const [results] = await pool.execute('SELECT * FROM employee WHERE admintable = ?', [userName]);
+
+      console.log("📊 Query executed, results:", results);
+
+      if (results.length === 0) {
+          console.log("⚠️ No user found with username:", userName);
+          return res.status(401).json({ message: 'Invalid username or password' });
+      }
+
+      const user = results[0];
+      console.log("✅ User found:", user);
+
+      if (password !== user.password) {
+          console.log("❌ Password does not match");
+          return res.status(401).json({ message: 'Invalid username or password' });
+      }
+
+      console.log("🎉 Login successful");
+
+      delete user.password;
+      res.json({ message: 'Login successful', user });
+
+  } catch (error) {
+      console.error("❌ Database error:", error);
+      res.status(500).json({ message: 'Database error' });
+  }
+});
+
 
 //insert User Details 
 
@@ -140,6 +193,19 @@ app.post('/saveUserDetails', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+//getuserDetails
+
+app.get('/getUserdetails', async (req, res) => {
+  try {
+    const [results] = await pool.query('SELECT * FROM userdetails');
+    res.json(results);
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    res.status(500).json({ message: 'Error fetching user details' });
+  }
+});
+
 
   
 

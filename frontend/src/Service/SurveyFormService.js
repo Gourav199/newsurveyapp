@@ -7,7 +7,7 @@ const api = axios.create({
 
 class surveyService {
     saveUserDetails(payload) {
-        alert("Hello iam  the service file")
+        // alert("Hello iam  the service file")
         console.log('====================================');
         console.log(payload);
         console.log('====================================');
@@ -25,6 +25,26 @@ class surveyService {
         alert(err.response.data.message);
       });
     }
+
+    getUserDetails(payload) {
+      // alert("Hello iam  the service file")
+      console.log('====================================');
+      console.log(payload);
+      console.log('====================================');
+      return api
+    .get(
+      "/getUserdetails",payload
+    )
+    .then((res) => {
+      console.log(res)
+      return res;
+      
+    })
+    .catch((err) => {
+      console.log(err);
+      alert(err.response.data.message);
+    });
+  }
 }
 
 export default new surveyService();

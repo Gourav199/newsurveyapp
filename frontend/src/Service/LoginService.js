@@ -25,6 +25,26 @@ class loginService {
         alert(err.response.data.message);
       });
     }
+
+    adminLogin(payload) {
+      // alert("Hello iam  the service file")
+      console.log('====================================');
+      console.log(payload);
+      console.log('====================================');
+      return api
+    .post(
+      "/admin-login",payload
+    )
+    .then((res) => {
+      console.log(res)
+      return res;
+      
+    })
+    .catch((err) => {
+      console.log(err);
+      alert(err.response.data.message);
+    });
+  }
 }
 
 export default new loginService();
